@@ -1,0 +1,165 @@
+================================================================================
+
+			ELF File Specification
+			Version: 0.0.0 (Draft)
+
+		This file is distributed under CC-BY-SA 4.0 License.
+		Copyright (c) 2023 lc3prj.
+
+================================================================================
+
+= Introduction
+
+This file defines the format of ELF files on lc3 architecture.
+
+= Overview
+
+An ELF file contains code, data, metadata and etc. and is able to run and link.
+An ELF file could contain a file header, a program header table and a section
+headers and their corresponding data.
+
+= File Header
+
+--------------------------------------------------------------------------------
+				File Header Fields
+
+Name		Offset		Size		Purpose
+EHDR_MAG0	0x00		1		0x7f
+EHDR_MAG1	0x01		1		0x45 ('E')
+EHDR_MAG2	0x02		1		0x4c ('L')
+EHDR_MAG3	0x03		1		0x46 ('F')
+EHDR_CLASS	0x04		1		0, 16bit file
+EHDR_DATA	0x05		1		1, lc3 follows little endianess
+EHDR_HVERSION	0x06		1		1, current ELF version
+EHDR_OSABI	0x07		1		0xff, reserved
+EHDR_ABIVERSION	0x08		1		0xff, reserved
+EHDR_PAD	0x09		7		0, for padding
+EHDR_TYPE	0x10		2		ELF file type, see table ELF
+						File Type
+EHDR_MACHINE	0x12		2		0x1145, for lc3
+EHDR_VERSION	0x14		4		1, current ELF version
+EHDR_ENTRY	0x18		4		The memory address of the entry
+						Point of the program. Zero for
+						a non-executable ELF file.
+EHDR_PHOFF	0x1c		4		The offset of the program
+						header table.
+EHDR_SHOFF	0x20		4		The offset of the section
+						header table
+EHDR_FLAGS	0x24		4		0, reserved.
+EHDR_EHSIZE	0x28		2		52
+EHDR_PHENTSIZE	0x2a		2		32, the size of one entry in
+						program header entry
+EHDR_PHNUM	0x2c		2		Number of entries in the program
+						header table
+EHDR_SHENTSIZE	0x2e		2		40, the size of one entry in
+						section header entry
+EHDR_SHNUM	0x30		2		Number of entries in the section
+						header table
+EHDR_SHSTRNDX	0x32		2		The index of the section table
+						entry containing sections names
+
+52 bytes in total.
+--------------------------------------------------------------------------------
+
+--------------------------------------------------------------------------------
+				ELF File Type
+
+Name		Value		Description
+ET_NONE		0x00		Unknown.
+ET_REL		0x01		Relocatable file.
+ET_EXEC		0x02		Executable file.
+ET_DYN		0x03		Shared object.
+ET_CORE		0x04		Corefile.
+
+= Program Header Table
+
+The program header table tells the system how to create a process image, which
+is located at offset EHDR_PHOFF in the file.
+
+--------------------------------------------------------------------------------
+				Program Header
+
+Name		Offset		Size		Purpose
+PHDR_TYPE	0x00		4		The type of this segment. See
+						table Segment Type
+PHDR_OFFSET	0x04		4		Offset of the segment in the
+						file
+PHDR_VADDR	0x08		4		Virtual address of the segment
+						in memory
+PHDR_PADDR	0x0c		4		Physical address of the segment
+						in memory
+PHDR_FILESZ	0x10		4		Size in bytes of the segment
+						in file
+PHDR_MEMSZ	0x14		4		Size in bytes of the segment
+						in memory
+PHDR_FLAGS	0x18		4		Segment dependent flags
+PHDR_ALIGN	0x1c		4		0 for no alignment.
+
+32 bytes in total.
+--------------------------------------------------------------------------------
+
+--------------------------------------------------------------------------------
+				Segment Type
+
+Name		Value		Description
+PT_NULL		0x00000000	Unused
+PT_LOAD		0x00000001	Loadable segment
+PT_DYNMAIC	0x00000002	Dynamic Linking Information
+PT_TLS		0x00000007	Thread-Local Storage Template
+--------------------------------------------------------------------------------
+
+= Section Header Table
+
+--------------------------------------------------------------------------------
+				Section Header
+
+Name		Offset		Size		Purpose
+
+SH_NAME		0x00		4		An offset to a string in
+						.shstrtab section, which
+						represents the name of this
+						section
+SH_TYPE		0x04		4		See table Section Type
+SH_FLAGS	0x08		4		See table Section Header Flags
+SH_ADDR		0x0c		4		Virtual address of the section
+						in memory
+SH_OFFSET	0x10		4		Offset of the section in the
+						file
+SH_SIZE		0x14		4		Size in bytes in the file
+SH_LINK		0x18		4		Index of the associated section
+SH_INFO		0x1c		4		Extra information of this
+						section
+SH_ADDRALIGN	0x20		4		Required alignment
+SH_ENTSIZE	0x24		4		The size of one entry for
+						sections containing fixed-size
+						entries.
+
+40 bytes in total.
+--------------------------------------------------------------------------------
+
+--------------------------------------------------------------------------------
+				Section Type
+
+Name		Value		Description
+SHT_NULL	0x00		Unused entry.
+SHT_DATA	0x01		Program data
+SHT_SYMTAB	0x02		Symbol table
+SHT_STRTAB	0x03		String table
+SHT_HASH	0x05		Symbol hash table
+SHT_DYNAMIC	0x06		Dynamic linking information
+SHT_NOTE	0x07		Notes
+SHT_NOBITS	0x08		Program space without data (.bss)
+SHT_REL		0x09		Relocation entries without addends
+--------------------------------------------------------------------------------
+
+--------------------------------------------------------------------------------
+				Section Header Flag
+
+Name		Value		Description
+SHF_WRITE	0x01		Writable
+SHF_ALLOC	0x02		Occupies memory during execution
+SHF_EXECINSTR	0x04		Executable
+SHF_MERGE	0x10		Might be merged
+SHF_STRINGS	0x20		Contains strings
+SHF_TLS		0x400		Holds thread-local data
+--------------------------------------------------------------------------------
