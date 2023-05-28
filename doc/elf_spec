@@ -1,12 +1,29 @@
 ================================================================================
 
 			ELF File Specification
-			Version: 0.0.0 (Draft)
+			Version: 0.0.1 (Draft)
 
 		This file is distributed under CC-BY-SA 4.0 License.
-		Copyright (c) 2023 lc3prj.
+		Copyright (c) 2023 lc3prj. All rights reserved.
 
 ================================================================================
+
+= Contents
+
+ o Introduction
+ o Overview
+ o File Header
+ o Program Header Table
+ o Section Header Table
+   o Sections
+     o .bss
+     o .data
+     o .rodata
+     o .shstrtab
+     o .strtab
+     o .symtab
+     o .rel
+     o .text
 
 = Introduction
 
@@ -163,3 +180,140 @@ SHF_MERGE	0x10		Might be merged
 SHF_STRINGS	0x20		Contains strings
 SHF_TLS		0x400		Holds thread-local data
 --------------------------------------------------------------------------------
+
+== Sections
+
+=== .bss: Uninitialised Data
+
+This section contains uninitialised data, which should be cleared as zero when
+the program starts to run. This section is of type SHT_NOBITS and flags
+SHF_ALLOC and SHF_WRITE are set.
+
+=== .data: Initialised Data
+
+This section contains initialised data. This section is of type SHT_DATA and
+flags SHF_ALLOC and SHF_WRITE are set.
+
+=== .rodata: Read-only Data
+
+This section contains read-only data. This section is of type SHT_DATA and flag
+SHF_ALLOC is set.
+
+=== .shstrtab: Section Name Table
+
+This section contains names of sections and is of type SHT_STRTAB.
+
+=== .strtab: String Table
+
+This section holds strings. If the file has a loadable segment that includes
+the symbol string table, the section's attributes will include SHF_ALLOC bit.
+Otherwise, flag SHF_ALLOC is cleared. This section is of type SHT_STRTAB.
+
+=== .symtab
+
+This section contains a symbol table.
+
+--------------------------------------------------------------------------------
+				Symbol Entry
+
+Name		Offset 		Size		Purpose
+st_name		0		4		The offset of the symbol's name
+						in the the string table.
+st_value	4		4		The value of the associated
+						symbol.
+st_size		8		4		The size of the symbol. 0 for
+						symbols with no or unknown sizes
+st_info		12		1		The symbol's type and binding
+						attributes. See table Symbol
+						Types.
+st_other	13		1		The symbol's visibility. See
+						table Symbol Visibility.
+st_shndx	14		2		The associated section's index.
+
+16 bytes in total.
+--------------------------------------------------------------------------------
+
+--------------------------------------------------------------------------------
+				Symbol Types
+
+Name		Value		Description
+STT_NOTYPE	0		Undefined.
+STT_OBJECT	1		The symbol is associated with a data object.
+STT_FUNC	2		The symbol is associated with executable code.
+STT_SECTION	3		The symbol is associated with a section.
+STT_FILE	4		The symbol is associated with a source file.
+STB_LOCAL	5		The symbol is a local symbol.
+STB_GLOGAL	6		The symbpl is a global symbol.
+STB_WEAK	7		The symbol is a weak symbol.
+--------------------------------------------------------------------------------
+
+--------------------------------------------------------------------------------
+				Symbol Visibility
+
+Name		Value		Description
+STV_DEFAULT	0		Default. Global and weak ones are available to
+				other modules.
+STV_HIDDEN	2		Hidden. Unavailable to other modules.
+STV_PROTECTED	3		Protected. Available to other modules but
+				references in the local module always resolve
+				to the local one.
+--------------------------------------------------------------------------------
+
+=== .rel
+
+This symbol contains relocation entries, which are shown in table Relocation Entries.
+
+--------------------------------------------------------------------------------
+				Relocation Entries
+
+Name		Offset		Size		Purpose
+r_offset	0		4		The location to apply the
+						relocation. The bytes offset
+						from the beginning of the
+						section for relocatable files,
+						the virtual address for
+						executable files or shared
+						objects.
+r_info		4		4		Bits [31:8] specify the symbol
+						table index. Bits [7:0] specify
+						the relocation type (see table
+						Relocation Type)
+
+8 bytes in total.
+--------------------------------------------------------------------------------
+
+--------------------------------------------------------------------------------
+				Relocation Type
+
+Meaing of Symbols in Relocation field:
+	P		The position of relocation
+	V		The value at the relocation position
+	S		The value of the associated symbol
+	uintxx		xx-bit unsigned integers
+	intxx		xx-bit signed integers
+
+Name		Value		Relocation		Description
+R_LC3_NONE	0		/			Unused.
+R_LC3_16	1		uint16: V		16-bit little-endian
+							integers.
+R_LC3_32	2		uint32: V		32-bit little-endian
+							integers.
+R_LC3_5		3		uint5: V		5-bit integers assigned
+							to bits [4:0].
+R_LC3_8_HI	4		uint8: V		8-bit integers assigned
+							to bits [15:8].
+R_LC3_8_LO	5		uint8: V		8-bit integers assigned
+							to bits [7:0].
+R_LC3_PCREL_5	6		int5: V - P		PC-relative 5-bit offset
+							assigned to bits [4:0]
+R_LC3_PCREL_9	7		int9: V - P		PC-relative 9-bit offset
+							assigned to bits [8:0]
+R_LC3_NEAR_CALL 8		int11: V - P		PC-relative 11-bit offset
+							assigned to bits [10:0]
+							for instruction JSR
+--------------------------------------------------------------------------------
+
+=== .text
+
+This section holds executable instructions of a program. This section is of type
+SHT_PROBITS and its attributes are SHF_ALLOC and SHF_EXECINSTR.
