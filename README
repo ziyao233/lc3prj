@@ -1,0 +1,21 @@
+--------------------------------------------------------------------------------
+
+				lc3prj
+
+--------------------------------------------------------------------------------
+
+= Introduction
+
+lc3prj is a series of program and documentation based on LC-3 ISA, aiming to
+create a toolchain for LC-3 machines.
+
+= Subprojects
+
+ o TinyCC-lc3
+   Port TinyCC to LC-3
+
+= Project Structure
+
+ o /
+   o doc
+     Documentation
