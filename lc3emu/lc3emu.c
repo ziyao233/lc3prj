@@ -109,7 +109,7 @@ do_instruction(void)
 		mMem[mMem[mPC + sext9(inst_imm9(inst))]] = mReg[inst_dr(inst)];
 		break;
 	case OP_JMP:
-		mPC += sext11(inst_imm11(inst));
+		mPC = mReg[inst_base(inst)];
 		break;
 	case OP_LEA:
 		mReg[inst_dr(inst)] = mPC + sext9(inst_imm9(inst));
