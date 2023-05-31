@@ -19,3 +19,7 @@ create a toolchain for LC-3 machines.
  o /
    o doc
      Documentation
+   o lc3emu
+     A Simple Emulator
+   o elf2bin
+     A tool to convert ELF files into binary images
