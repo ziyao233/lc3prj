@@ -1,0 +1,79 @@
+--------------------------------------------------------------------------------
+				Calling Convention
+				Version: 0.0.0 (Draft)
+
+		This file is distributed under CC-BY-SA 4.0 License.
+		Copyright (c) 2023 lc3prj. All rights reserved.
+--------------------------------------------------------------------------------
+
+= Contents
+
+ o Registers
+ o Types
+   o Scalars
+   o Structures
+ o Function Calling
+   o Argument Passing
+   o Return Value
+
+= Introduction
+
+This file describes the calling convention used on LC3 architecture.
+
+= Registers
+
+Registers aliases and usage are shown in the table below. (table Registers)
+
+--------------------------------------------------------------------------------
+				Registers
+
+ID	Aliases		Saver		Usage
+0	t0/rv		Caller		Temporary Value / Return Value
+1	t1		Caller		Temporary Value
+2	t2		Caller		Temporary Value
+3	s0		Callee		Saved Value
+4	s1		Callee		Saved Value
+5	fp		Callee		Stackframe Pointer
+6	sp		Callee		Stack Pointer
+7	t3		Callee		Return Address
+
+--------------------------------------------------------------------------------
+
+= Types
+
+== Scalars
+
+Scalars are simple values, whose sizes are reasonable to be held in registers.
+
+--------------------------------------------------------------------------------
+				Scalar Types
+
+Name		Size
+char		1
+short		1
+int		2
+long		4
+
+--------------------------------------------------------------------------------
+
+All scalars are always aligned by 2 bytes.
+
+== Structures
+
+Structures are combination of scalars and follow the same alignment rule as
+scalars (aligned by 2 bytes)
+
+= Function Calling
+
+Function calling is done by JSR instruction and a return is done by RET
+instruction (or JMP ra).
+
+== Arguments Passing
+
+Before a function call, the arguments of the callee must be pushed onto the
+stack from right to left, i.e. the leftest argument is pushed at last.
+
+== Return Value
+
+The returned value is placed in rv (r0) if it is small enough (2 bytes) to be
+held in a register. Otherwise it should be pushed onto the stack.
